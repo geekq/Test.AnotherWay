@@ -104,6 +104,10 @@ if( typeof( Test )=="undefined" ) {
 }
 Test.AnotherWay={};
 
+Test.AnotherWay.h = function (s) {
+    return s.split("&").join("&amp;").split( "<").join("&lt;").split(">").join("&gt;")
+}
+
 Test.AnotherWay._g_test_iframe=null; // frame where to load test pages
 Test.AnotherWay._g_test_frame_no_clear=false; // true - leave last page displayed after tests end
 Test.AnotherWay._g_test_page_urls=[]; // array of: { url: url, convention: "anotherway" or "jsan" }
@@ -259,7 +263,7 @@ Test.AnotherWay._test_object_t=function( fun_name )
 	this.n_plan=null; // planned number of assertions
 	this.n_ok=0; // # of ok assertions
 	this.n_fail=0; // # of failed assertions
-	this.exception=""; // if the function throwed an exception, it's its message
+	this.exception=""; // if the function throwed an exception, it is its message
 	this.exception_stack=[]; // strings: function call stack from the exception
 	this.assertions=[]; // assertion results: array of { ok: 1 or 0, name: string }
 	this.wait_result_milliseconds=0; // how long to wait before collecting results from the test
@@ -276,8 +280,8 @@ Test.AnotherWay._test_object_t=function( fun_name )
 	this.delay_total_milliseconds_left=0; 	// for indication: total estimated time for all actions, runs up and down
 }
 
-Test.AnotherWay._test_object_t.prototype.log_result=function(success, explicit_assertion_msg, auto_msg) {
-        var details = { assertion_msg: explicit_assertion_msg, auto_msg: auto_msg}
+Test.AnotherWay._test_object_t.prototype.log_result=function(success, assertion_msg, auto_msg) {
+        var details = { assertion_msg: assertion_msg, auto_msg: auto_msg}
 	if( success ) {
 		this.n_ok += 1;
                 details.ok = 1;
@@ -288,12 +292,12 @@ Test.AnotherWay._test_object_t.prototype.log_result=function(success, explicit_a
         this.assertions.push( details );
 }
 
-Test.AnotherWay._test_object_t.prototype.ok = function (cond, explicit_assertion_msg, auto_msg) {
-        this.log_result(cond, explicit_assertion_msg, auto_msg);
+Test.AnotherWay._test_object_t.prototype.ok = function (cond, assertion_msg, auto_msg) {
+        this.log_result(cond, assertion_msg, auto_msg);
 }
 
-Test.AnotherWay._test_object_t.prototype.fail = function (explicit_assertion_msg) {
-        this.log_result(false, explicit_assertion_msg);
+Test.AnotherWay._test_object_t.prototype.fail = function (assertion_msg) {
+        this.log_result(false, assertion_msg);
 }
 
 Test.AnotherWay._test_object_t.prototype.plan=function( n )
@@ -472,10 +476,13 @@ Test.AnotherWay._html_eq_path_msg=function( path )
 	}
 	return msg;
 }
-Test.AnotherWay._html_eq_fail_msg=function( path, what, expected, got )
-{
-	return Test.AnotherWay._html_eq_path_msg( path )+": "+what+" differ: got "+got+", but expected "+expected;
+
+Test.AnotherWay._html_eq_fail_msg = function (path, what, expected, got) {
+  return "eq: " + path + " " + what + " differ: got " +
+    "<code>" + got + "</code>but expected "  +
+    "<code>" + expected + "</code>";
 }
+
 Test.AnotherWay._html_eq_remove_blank=function( text )
 {
 	if( text==null ) {
@@ -635,32 +642,35 @@ Test.AnotherWay._html_eq_get_loc_base=function( node )
 	}
 	return loc_base;
 }
-Test.AnotherWay._test_object_t.prototype.html_eq=function( got, expected, name )
-{
+
+Test.AnotherWay._test_object_t.prototype.html_eq = function (got, expected, assert_msg) {
 	var msg={};
 	var expected_node=Test.AnotherWay._html_eq_string_to_node( expected, "expected", msg );
-	if( msg.msg!=null ) {
-		this.fail( name+" html_eq: "+msg.msg );
+	if( msg.msg != null ) {
+		this.log_result(false, assert_msg, " html_eq: " + msg.msg );
 	}else {
 		var got_node=Test.AnotherWay._html_eq_string_to_node( got, "got", msg );
 		if( msg.msg!=null ) {
-			this.fail( name+" html_eq: "+msg.msg );
+			this.log_result(false, assert_msg, " html_eq: " + msg.msg );
 		}else {
 			var expected_loc_base=Test.AnotherWay._html_eq_get_loc_base( expected );
 			var got_loc_base=Test.AnotherWay._html_eq_get_loc_base( got );
 			if( Test.AnotherWay._html_eq_node( expected_node, got_node, [], msg, expected_loc_base, got_loc_base ) ) {
-				this.ok( 1, name );
-			}else {
-				var msg=name+" html_eq "+msg.msg;
-				var expected_str=Test.AnotherWay._html_eq_node_to_string( expected_node );
-				var got_str=Test.AnotherWay._html_eq_node_to_string( got_node );
-				msg+=".\n got html: "+got_str;
-				msg+=".\n expected html: "+expected_str;
-				this.fail( msg );
+				this.log_result(true, assert_msg);
+			} else {
+                          var auto_msg = "<div> html_eq " + msg.msg;
+				var expected_str = Test.AnotherWay._html_eq_node_to_string( expected_node );
+				var got_str = Test.AnotherWay._html_eq_node_to_string( got_node );
+                                auto_msg += "\n <p style='margin-top: 1.5em'>"
+                                auto_msg += "\n Got html: <code>" + Test.AnotherWay.h(got_str) + "</code>";
+                                auto_msg += "\n expected html: <code>" + Test.AnotherWay.h(expected_str) + "</code>";
+                                auto_msg += "\n </div>"
+                                this.log_result(false, assert_msg, auto_msg);
 			}
 		}
 	}
 }
+
 Test.AnotherWay._debug_pane_print=function( msg )
 {
 	var d=new Date();
