@@ -261,17 +261,22 @@ Test.AnotherWay._test_object_t=function( fun_name )
 	this.delay_total_milliseconds_left=0; 	// for indication: total estimated time for all actions, runs up and down
 }
 
-Test.AnotherWay._test_object_t.prototype.ok=function( cond, explicit_assertion_msg, auto_msg )
-{
-	if( cond ) {
-		++this.n_ok;
-		cond=1;
+Test.AnotherWay._test_object_t.prototype.log_result=function(success, explicit_assertion_msg, auto_msg) {
+        var details = { assertion_msg: explicit_assertion_msg, auto_msg: auto_msg}
+	if( success ) {
+		this.n_ok += 1;
+                details.ok = 1;
 	}else {
-		++this.n_fail;
-		cond=0;
+		this.n_fail += 1;
+                details.ok = 0;
 	}
-        this.assertions.push( { ok: cond, assertion_msg: explicit_assertion_msg, auto_msg: auto_msg} );
+        this.assertions.push( details );
 }
+
+Test.AnotherWay._test_object_t.prototype.ok=function( cond, explicit_assertion_msg, auto_msg ) {
+        this.log_result(cond, explicit_assertion_msg, auto_msg);
+}
+
 Test.AnotherWay._test_object_t.prototype.fail=function( name )
 {
 	this.ok( false, name);
