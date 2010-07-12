@@ -63,7 +63,10 @@ body { height: 98%; font: normal normal 10pt sans-serif }
 #results p.running .bullet { background: #26e; }
 #results p.waiting .bullet { background: #04d; }
 
-span.assertion_msg { background-color: #ffb; padding: 0px 3px }
+span.assertion_msg { background-color: #dfc; padding: 0px 3px; margin: 0px 5px }
+span.ok { background-color: #dfc; }
+
+span.fail + span.assertion_msg { background-color: #ffd8d8 }
 .result_micro_detail code {
   display: block;
   -moz-background-inline-policy:continuous;
@@ -74,7 +77,7 @@ span.assertion_msg { background-color: #ffb; padding: 0px 3px }
   line-height:1.385em;
   overflow:auto;
   padding:2px 4px 0;
-  margin-left: 2em;
+  margin: 3px 4px 3px 27px;
 }
 
 /* highlight in the results line */
@@ -1277,7 +1280,8 @@ Test.AnotherWay._print_result=function( url, msg, style, test_objects )
 				Test.AnotherWay._set_css_class( micro_detail, "result_micro_detail" );
 
                                 elemStatus = document.createElement('span');
-				elemStatus.innerHTML = oo.ok ? "ok" : "<span class=\"fail\">fail</span>";
+				elemStatus.setAttribute('class', oo.ok ? 'ok' : 'fail');
+                                elemStatus.appendChild(document.createTextNode(oo.ok ? 'ok' : 'fail'));
                                 micro_detail.appendChild(elemStatus);
 
                                 if (oo.assertion_msg) {
