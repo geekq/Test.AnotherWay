@@ -63,7 +63,19 @@ body { height: 98%; font: normal normal 10pt sans-serif }
 #results p.running .bullet { background: #26e; }
 #results p.waiting .bullet { background: #04d; }
 
-span.assertion_msg { background-color: #ffb }
+span.assertion_msg { background-color: #ffb; padding: 0px 3px }
+.result_micro_detail code {
+  display: block;
+  -moz-background-inline-policy:continuous;
+  background:none repeat scroll 0 0 #EEEEEE;
+  border:1px solid #DDDDDD;
+  font-family:Consolas,"Andale Mono",monospace;
+  font-size:0.929em;
+  line-height:1.385em;
+  overflow:auto;
+  padding:2px 4px 0;
+  margin-left: 2em;
+}
 
 /* highlight in the results line */
 #results p .warning { background: #ffc; }
@@ -273,14 +285,14 @@ Test.AnotherWay._test_object_t.prototype.log_result=function(success, explicit_a
         this.assertions.push( details );
 }
 
-Test.AnotherWay._test_object_t.prototype.ok=function( cond, explicit_assertion_msg, auto_msg ) {
+Test.AnotherWay._test_object_t.prototype.ok = function (cond, explicit_assertion_msg, auto_msg) {
         this.log_result(cond, explicit_assertion_msg, auto_msg);
 }
 
-Test.AnotherWay._test_object_t.prototype.fail=function( name )
-{
-	this.ok( false, name);
+Test.AnotherWay._test_object_t.prototype.fail = function (explicit_assertion_msg) {
+        this.log_result(false, explicit_assertion_msg);
 }
+
 Test.AnotherWay._test_object_t.prototype.plan=function( n )
 {
 	this.n_plan=n;
@@ -289,9 +301,12 @@ Test.AnotherWay._test_object_t.prototype.wait_result=function( seconds )
 {
 	this.wait_result_milliseconds=1000*seconds;
 }
-Test.AnotherWay._eq_fail_msg=function( path, what, expected, got )
-{
-	return "eq: "+path+" "+what+" differ: got "+got+", but expected "+expected;
+
+Test.AnotherWay._eq_fail_msg = function( path, what, expected, got ) {
+  return "eq: " + path + " " + what + " differ: got " +
+    "<code>" + got + "</code>but expected "  +
+    "<code>" + expected + "</code>";
+
 }
 Test.AnotherWay._array_eq=function( expected, got, path, msg )
 {
@@ -395,15 +410,16 @@ Test.AnotherWay._thing_eq=function( expected, got, path, msg )
 		}
 	}
 }
-Test.AnotherWay._test_object_t.prototype.eq=function( got, expected, name )
-{
+
+Test.AnotherWay._test_object_t.prototype.eq=function( got, expected, assertion_msg) {
 	var msg={};
 	if( Test.AnotherWay._thing_eq( expected, got, "", msg ) ) {
-		this.ok( 1, name );
-	}else {
-		this.fail( name+". "+msg.msg );
+                this.log_result(true, assertion_msg);
+	} else {
+                this.log_result(false, assertion_msg, msg.msg);
 	}
 }
+
 Test.AnotherWay._test_object_t.prototype.like=function( got, expected, name )
 {
 	if( got.match( expected )!=null ) {
@@ -1256,21 +1272,27 @@ Test.AnotherWay._print_result=function( url, msg, style, test_objects )
 				detail.appendChild( p );
 			}
 			for( var ii=0; ii<o.assertions.length; ++ii ) {
-				var oo=o.assertions[ii];
-				var status=oo.ok ? "ok" : "<span class=\"fail\">fail</span>";
-				p=document.createElement( "P" );
-				Test.AnotherWay._set_css_class( p, "result_micro_detail" );
-				p.innerHTML=status + ' ';
+				var oo = o.assertions[ii];
+				micro_detail = document.createElement( "P" );
+				Test.AnotherWay._set_css_class( micro_detail, "result_micro_detail" );
+
+                                elemStatus = document.createElement('span');
+				elemStatus.innerHTML = oo.ok ? "ok" : "<span class=\"fail\">fail</span>";
+                                micro_detail.appendChild(elemStatus);
+
                                 if (oo.assertion_msg) {
-                                  elem_msg = document.createElement('span');
-                                  elem_msg.appendChild(document.createTextNode(oo.assertion_msg));
-                                  elem_msg.setAttribute('class', 'assertion_msg');
-                                  p.appendChild(elem_msg);
+                                  elemAssertionMsg = document.createElement('span');
+                                  elemAssertionMsg.appendChild(document.createTextNode(oo.assertion_msg));
+                                  elemAssertionMsg.setAttribute('class', 'assertion_msg');
+                                  micro_detail.appendChild(elemAssertionMsg);
                                 }
                                 if (oo.auto_msg) {
-                                  p.appendChild( document.createTextNode( " "+oo.auto_msg ) );
+                                  elemAutoMsg = document.createElement('span');
+                                  elemAutoMsg.innerHTML = oo.auto_msg;
+                                  micro_detail.appendChild(elemAutoMsg);
                                 }
-				detail.appendChild( p );
+
+				detail.appendChild( micro_detail );
 			}
 			total_detail_ok+=o.n_ok;
 			total_detail_fail+=o.n_fail;
