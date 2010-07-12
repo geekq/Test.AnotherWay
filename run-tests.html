@@ -63,8 +63,9 @@ body { height: 98%; font: normal normal 10pt sans-serif }
 #results p.running .bullet { background: #26e; }
 #results p.waiting .bullet { background: #04d; }
 
-span.assertion_msg { background-color: #dfc; padding: 0px 3px; margin: 0px 5px }
-span.ok { background-color: #dfc; }
+span.assertion_msg { background-color: #dfc; padding: 0px 3px; }
+.result_micro_detail span.ok { background-color: #dfc; }
+.result_micro_detail span.ok, .result_micro_detail span.fail { margin-right: 5px }
 
 span.fail + span.assertion_msg { background-color: #ffd8d8 }
 .result_micro_detail code {
