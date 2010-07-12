@@ -62,6 +62,9 @@ body { height: 98%; font: normal normal 10pt sans-serif }
 #results p.loading .bullet { background: #48f; }
 #results p.running .bullet { background: #26e; }
 #results p.waiting .bullet { background: #04d; }
+
+span.assertion_msg { background-color: #ffb }
+
 /* highlight in the results line */
 #results p .warning { background: #ffc; }
 
@@ -258,7 +261,7 @@ Test.AnotherWay._test_object_t=function( fun_name )
 	this.delay_total_milliseconds_left=0; 	// for indication: total estimated time for all actions, runs up and down
 }
 
-Test.AnotherWay._test_object_t.prototype.ok=function( cond, name )
+Test.AnotherWay._test_object_t.prototype.ok=function( cond, explicit_assertion_msg, auto_msg )
 {
 	if( cond ) {
 		++this.n_ok;
@@ -267,11 +270,11 @@ Test.AnotherWay._test_object_t.prototype.ok=function( cond, name )
 		++this.n_fail;
 		cond=0;
 	}
-	this.assertions.push( { ok: cond, name: name } );
+        this.assertions.push( { ok: cond, assertion_msg: explicit_assertion_msg, auto_msg: auto_msg} );
 }
 Test.AnotherWay._test_object_t.prototype.fail=function( name )
 {
-	this.ok( false, name );
+	this.ok( false, name);
 }
 Test.AnotherWay._test_object_t.prototype.plan=function( n )
 {
@@ -1252,8 +1255,16 @@ Test.AnotherWay._print_result=function( url, msg, style, test_objects )
 				var status=oo.ok ? "ok" : "<span class=\"fail\">fail</span>";
 				p=document.createElement( "P" );
 				Test.AnotherWay._set_css_class( p, "result_micro_detail" );
-				p.innerHTML=status;
-				p.appendChild( document.createTextNode( " "+oo.name ) );
+				p.innerHTML=status + ' ';
+                                if (oo.assertion_msg) {
+                                  elem_msg = document.createElement('span');
+                                  elem_msg.appendChild(document.createTextNode(oo.assertion_msg));
+                                  elem_msg.setAttribute('class', 'assertion_msg');
+                                  p.appendChild(elem_msg);
+                                }
+                                if (oo.auto_msg) {
+                                  p.appendChild( document.createTextNode( " "+oo.auto_msg ) );
+                                }
 				detail.appendChild( p );
 			}
 			total_detail_ok+=o.n_ok;
