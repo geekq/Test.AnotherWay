@@ -149,7 +149,10 @@ Test.AnotherWay._add_test_page_url=function( test_url, convention )
 
 	cell=row.insertCell( -1 );
 	cell.setAttribute( "width", "75%" );
-	cell.appendChild( document.createTextNode( test_url ) );
+	cell_child=document.createElement( "a" );
+        cell_child.href=test_url;
+        cell_child.appendChild( document.createTextNode( test_url ) );
+	cell.appendChild( cell_child );
 
 	cell=row.insertCell( -1 );
 	cell_child=document.createElement( "input" );
