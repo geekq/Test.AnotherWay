@@ -106,7 +106,7 @@ if( typeof( Test )=="undefined" ) {
 Test.AnotherWay={};
 
 Test.AnotherWay.h = function (s) {
-    s = s.replace(/<\/\w+>/g, '$&\n'); // break lines after every tag
+    s = (s + '').replace(/<\/\w+>/g, '$&\n'); // break lines after every tag
     return s.split("&").join("&amp;").split( "<").join("&lt;").split(">").join("&gt;")
 }
 
