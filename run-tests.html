@@ -30,7 +30,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 html { height: 99%; }
 body { height: 98%; font: normal normal 10pt sans-serif }
 #col1 {  float: left; width: 27em; margin: 0 0 0 1em; overflow: visible; }
-#col2 {  position: relative; height: 98%; margin: 0 0.5em 0 27em; }
+#col2 {  position: relative; height: 70%; margin: 0 0.5em 0 27em; }
 #col1_header { margin-top: 0.5em; }
 #testtable { margin: 0 0 2em 0; width: 97%; }
 #run_buttons { margin-bottom: 4em; }
@@ -43,7 +43,7 @@ body { height: 98%; font: normal normal 10pt sans-serif }
 .inactive_tab 			{ float: right; padding: 0 1em 0 1em; background: #9bb; color: #444; border: 1px solid #9bb; border-bottom: none; cursor: pointer; cursor: hand; }
 .inactive_mouseover_tab 	{ float: right; padding: 0 1em 0 1em; background: #9bb; color: #062; border: 1px solid #062; border-bottom: none; cursor: pointer; cursor: hand; }
 
-#right_frame { overflow: auto; position: relative; top: -0.2em; clear: right; height: 95%; border: 1px solid #048; }
+#right_frame { overflow: auto; position: relative; top: -0.2em; clear: right; height: 93%; border: 1px solid #048; }
 
 #debug { display: none; }
 #debug p { margin: 2px 0 0 5em; text-indent: -4.8em; }
@@ -79,6 +79,12 @@ span.fail + span.assertion_msg { background-color: #ffd8d8 }
   overflow:auto;
   padding:2px 4px 0;
   margin: 3px 4px 3px 27px;
+}
+
+#test_iframe {
+  width: 50%;
+  height: 30%;
+  border: 1px solid black;
 }
 
 /* highlight in the results line */
@@ -907,8 +913,7 @@ Test.AnotherWay._is_url_loaded=function( url, wnd )
 	return loaded;
 }
 // find and run all test functions in the g_cur_page html page.
-Test.AnotherWay._test_page_onload=function()
-{
+Test.AnotherWay._test_page_onload = function() {
 	if( Test.AnotherWay._g_tests_queue.length==0 ) {
 		return;
 	}
@@ -923,6 +928,7 @@ Test.AnotherWay._test_page_onload=function()
 		// get test function names (those beginning with "test")
 		if( typeof( Test.AnotherWay._g_test_iframe.document.scripts )!='undefined' ) { // IE
 			for( var i=0; i<Test.AnotherWay._g_test_iframe.document.scripts.length; ++i ) {
+                          console.log('GLOBAL ' + Test.AnotherWay._g_test_iframe.DONOT_RUN_TESTS);
 				var script_text=Test.AnotherWay._g_test_iframe.document.scripts[i].text;
 				var fun_sig="function test";
 				var fun_start=script_text.indexOf( fun_sig );
@@ -1208,9 +1214,8 @@ Test.AnotherWay._delay_replay_event=function( test_object, wnd, event, checkpoin
 	}
 }
 
-Test.AnotherWay._print_counter_result=function( url, msg, milliseconds, style )
-{
-	return Test.AnotherWay._print_result( url, msg+"<span class=\"counter\">"+(milliseconds/1000).toFixed()+"</span>", style, null );
+Test.AnotherWay._print_counter_result=function( url, msg, milliseconds, style ) {
+  return Test.AnotherWay._print_result( url, msg+"<span class='counter'>" + (milliseconds / 1000).toFixed() + "</span>", style, null );
 }
 
 Test.AnotherWay._g_result_count=0; // for assigning unique ids to result paragraphs
@@ -2286,18 +2291,16 @@ onload=function()
 	}
 
 	var f=Test.AnotherWay._g_test_iframe;
-	try {
-		if( f.attachEvent!=null ) {
-			f.attachEvent( "onload", Test.AnotherWay._test_page_onload );
-		}else {
-			f.onload=Test.AnotherWay._test_page_onload;
-		}
-		if( Test.AnotherWay._g_test_iframe.nodeType!=null && Test.AnotherWay._g_test_iframe.contentWindow!=null ) { // it's iframe element, not the iframe. we need iframe.
-			Test.AnotherWay._g_test_iframe=Test.AnotherWay._g_test_iframe.contentWindow;
-		}
-	}catch(e) {
-		// ignore stupid opera error if the frame has onload handler assigned in the inline html
-	}
+
+        if( f.attachEvent!=null ) {
+                f.attachEvent( "onload", Test.AnotherWay._test_page_onload );
+        } else {
+                f.onload=Test.AnotherWay._test_page_onload;
+        }
+        if( Test.AnotherWay._g_test_iframe.nodeType!=null && Test.AnotherWay._g_test_iframe.contentWindow!=null ) { // it is iframe element, not the iframe. we need iframe.
+                Test.AnotherWay._g_test_iframe=Test.AnotherWay._g_test_iframe.contentWindow;
+        }
+
 	var handlers={
 		"run_all": { "onclick": Test.AnotherWay._run_all_onclick },
 		"run_selected": { "onclick": Test.AnotherWay._run_selected_onclick },
@@ -2374,9 +2377,10 @@ onload=function()
 </div>
 </div>
 
-<span style="display:none">
-<iframe name="list_iframe" onload="Test.AnotherWay._list_iframe_onload();"></iframe>
-<iframe name="test_iframe" onload="Test.AnotherWay._test_page_onload();"></iframe>
+<iframe name="list_iframe" style="display:none" onload="Test.AnotherWay._list_iframe_onload();"></iframe>
+<iframe name="test_iframe"  id="test_iframe" onload="Test.AnotherWay._test_page_onload();"></iframe>
+
+<div style="display:none">
 
 <!-- record_control div is to be imported into other documents, so all its styles are inline -->
 -<div id="record_control" style="position:absolute;bottom:0;left:0;margin:0;padding:0.5em;width:22em;height:22em;border:1px solid;background:#ffd;font: normal normal 8pt sans-serif; color:#000; text-align: left">
@@ -2434,5 +2438,5 @@ checkpoints:
 </div>
 </div>
 
-</span>
+</div>
 </body></html>
