@@ -68,7 +68,7 @@ span.assertion_msg { background-color: #dfc; padding: 0px 3px; }
 .result_micro_detail span.ok, .result_micro_detail span.fail { margin-right: 5px }
 
 span.fail + span.assertion_msg { background-color: #ffd8d8 }
-.result_micro_detail code {
+.result_micro_detail pre {
   display: block;
   -moz-background-inline-policy:continuous;
   background:none repeat scroll 0 0 #EEEEEE;
@@ -106,6 +106,7 @@ if( typeof( Test )=="undefined" ) {
 Test.AnotherWay={};
 
 Test.AnotherWay.h = function (s) {
+    s = s.replace(/<\/\w+>/g, '$&\n'); // break lines after every tag
     return s.split("&").join("&amp;").split( "<").join("&lt;").split(">").join("&gt;")
 }
 
@@ -312,8 +313,8 @@ Test.AnotherWay._test_object_t.prototype.wait_result=function( seconds )
 
 Test.AnotherWay._eq_fail_msg = function( path, what, expected, got ) {
   return "eq: " + path + " " + what + " differ: got " +
-    "<code>" + Test.AnotherWay.h(got) + "</code>but expected "  +
-    "<code>" + Test.AnotherWay.h(expected) + "</code>";
+    "<pre>" + Test.AnotherWay.h(got) + "</pre>but expected "  +
+    "<pre>" + Test.AnotherWay.h(expected) + "</pre>";
 
 }
 Test.AnotherWay._array_eq=function( expected, got, path, msg )
@@ -480,8 +481,8 @@ Test.AnotherWay._html_eq_path_msg=function( path )
 
 Test.AnotherWay._html_eq_fail_msg = function (path, what, expected, got) {
   return "eq: " + path + " " + what + " differ: got " +
-    "<code>" + Test.AnotherWay.h(got) + "</code>but expected "  +
-    "<code>" + Test.AnotherWay.h(expected) + "</code>";
+    "<pre>" + Test.AnotherWay.h(got) + "</pre>but expected "  +
+    "<pre>" + Test.AnotherWay.h(expected) + "</pre>";
 }
 
 Test.AnotherWay._html_eq_remove_blank=function( text )
@@ -663,8 +664,8 @@ Test.AnotherWay._test_object_t.prototype.html_eq = function (got, expected, asse
 				var expected_str = Test.AnotherWay._html_eq_node_to_string( expected_node );
 				var got_str = Test.AnotherWay._html_eq_node_to_string( got_node );
                                 auto_msg += "\n <p style='margin-top: 1.5em'>"
-                                auto_msg += "\n Got html: <code>" + Test.AnotherWay.h(got_str) + "</code>";
-                                auto_msg += "\n expected html: <code>" + Test.AnotherWay.h(expected_str) + "</code>";
+                                auto_msg += "\n Got html: <pre>" + Test.AnotherWay.h(got_str) + "</pre>";
+                                auto_msg += "\n expected html: <pre>" + Test.AnotherWay.h(expected_str) + "</pre>";
                                 auto_msg += "\n </div>"
                                 this.log_result(false, assert_msg, auto_msg);
 			}
