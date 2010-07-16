@@ -426,7 +426,7 @@ Test.AnotherWay._thing_eq=function( expected, got, path, msg )
 	}
 }
 
-Test.AnotherWay._test_object_t.prototype.eq=function( got, expected, assertion_msg) {
+Test.AnotherWay._test_object_t.prototype.eq=function(expected, got, assertion_msg) {
 	var msg={};
 	if( Test.AnotherWay._thing_eq( expected, got, "", msg ) ) {
                 this.log_result(true, assertion_msg);
@@ -435,7 +435,7 @@ Test.AnotherWay._test_object_t.prototype.eq=function( got, expected, assertion_m
 	}
 }
 
-Test.AnotherWay._test_object_t.prototype.like=function( got, expected, name )
+Test.AnotherWay._test_object_t.prototype.like=function(expected, got, name )
 {
 	if( got.match( expected )!=null ) {
 		this.ok( 1, name );
@@ -928,7 +928,6 @@ Test.AnotherWay._test_page_onload = function() {
 		// get test function names (those beginning with "test")
 		if( typeof( Test.AnotherWay._g_test_iframe.document.scripts )!='undefined' ) { // IE
 			for( var i=0; i<Test.AnotherWay._g_test_iframe.document.scripts.length; ++i ) {
-                          console.log('GLOBAL ' + Test.AnotherWay._g_test_iframe.DONOT_RUN_TESTS);
 				var script_text=Test.AnotherWay._g_test_iframe.document.scripts[i].text;
 				var fun_sig="function test";
 				var fun_start=script_text.indexOf( fun_sig );
